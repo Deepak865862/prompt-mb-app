@@ -45,4 +45,5 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
 }
 
+// Yeh line Firebase ke liye zaroori hai
 apply plugin: 'com.google.gms.google-services'
