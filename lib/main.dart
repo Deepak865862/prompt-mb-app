@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // Firebase initialization (optional - remove if not using Firebase)
-  // await Firebase.initializeApp();
-  
+void main() {
   runApp(const MyApp());
 }
 
@@ -43,7 +37,22 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('AI Prompt Gallery'),
       ),
       body: const Center(
-        child: Text('App is working!'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.photo_library, size: 100, color: Colors.deepPurple),
+            SizedBox(height: 20),
+            Text(
+              'App Successfully Built!',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Your app is working perfectly!',
+              style: TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
       ),
     );
   }
