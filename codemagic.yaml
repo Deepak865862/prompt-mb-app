@@ -30,3 +30,7 @@ workflows:
     artifacts:
       - build/**/outputs/**/*.apk
       - build/**/outputs/**/*.aab
+   artifacts:
+     - build/**/outputs/**/*.apk
+     - build/**/outputs/**/*.aab
+     - build/web/**/*
