@@ -5,8 +5,6 @@ workflows:
     environment:
       vars:
         FLUTTER_VERSION: "3.24.5"
-      android_signing:
-        - android_debug_keystore
     cache:
       cache_paths:
         - $HOME/.pub-cache
