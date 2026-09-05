@@ -1,0 +1,44 @@
+workflows:
+  android-workflow:
+    name: Android Build
+    max_build_duration: 90
+    environment:
+      vars:
+        FLUTTER_VERSION: "3.24.5"
+        JAVA_VERSION: "17"
+      android_signing:
+        - android_debug_keystore
+    triggers:
+      - push
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/.gradle/caches
+        - $HOME/Library/Android/sdk
+    scripts:
+      - name: Set up Android SDK
+        script: |
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+      - name: Set Java version
+        script: |
+          java -version
+      - name: Install Flutter
+        script: |
+          cd $HOME
+          rm -rf flutter
+          git clone https://github.com/flutter/flutter.git -b 3.24.5 --depth 1
+          export PATH="$HOME/flutter/bin:$PATH"
+          flutter doctor
+      - name: Get Flutter packages
+        script: |
+          export PATH="$HOME/flutter/bin:$PATH"
+          cd $CM_BUILD_DIR
+          flutter pub get
+      - name: Build APK
+        script: |
+          export PATH="$HOME/flutter/bin:$PATH"
+          cd $CM_BUILD_DIR
+          flutter build apk --debug --android-skip-build-dependency-validation
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
