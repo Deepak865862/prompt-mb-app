@@ -6,37 +6,43 @@ plugins {
 
 android {
     namespace "com.example.prompt_mb"
-    compileSdk = 35
-    ndkVersion = flutter.ndkVersion
+    compileSdk 34
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '1.8'
     }
 
     defaultConfig {
-        applicationId = "com.example.prompt_mb"
-        minSdk = 23
-        targetSdk = 35
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        applicationId "com.example.prompt_mb"
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug
+            signingConfig signingConfigs.debug
         }
     }
 }
 
 flutter {
-    source = '../..'
+    source '../..'
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
+
+apply plugin: 'com.google.gms.google-services'
