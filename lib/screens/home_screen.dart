@@ -5,6 +5,7 @@ import '../widgets/neon_background.dart';
 import '../widgets/prompt_card.dart';
 import '../models/prompt_model.dart';
 import '../services/wordpress_service.dart';
+import 'prompt_detail_screen.dart'; // Detail screen ko import kiya
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,19 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return NeonBackground(
       child: Scaffold(
-        backgroundColor: Colors.transparent, // NeonBackground dikhne ke liye
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: const Text('Prompt MB', style: TextStyle(fontWeight: FontWeight.bold)),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                // Baad mein search screen par navigate karenge
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Search Screen coming soon!')),
-                );
-              },
-            ),
+          actions: const [
+            Icon(Icons.search, color: Colors.white), // Abhi ke liye sirf icon
           ],
         ),
         body: Column(
@@ -89,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onSelected: (bool selected) {
                         setState(() {
                           _selectedCategory = category;
-                          // Yahan baad mein category ke hisab se filter logic lagayenge
+                          // Future me yahan category filter logic aayega
                         });
                       },
                       selectedColor: AppTheme.neonPurple,
@@ -108,16 +101,15 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {
-                  // Infinite Scrolling Logic
                   if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-                    _loadPrompts();
+                    _loadPrompts(); // Infinite Scrolling
                   }
                   return true;
                 },
                 child: _prompts.isEmpty && _isLoading
                     ? const Center(child: CircularProgressIndicator(color: AppTheme.neonBlue))
                     : MasonryGridView.count(
-                        crossAxisCount: 2, // 2 columns (Pinterest style)
+                        crossAxisCount: 2, 
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
                         padding: const EdgeInsets.all(8),
@@ -134,9 +126,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           return PromptCard(
                             prompt: _prompts[index],
                             onTap: () {
-                              // Baad mein Detail Screen par navigate karenge
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Opened: ${_prompts[index].title}')),
+                              // YAHAN MAGIC HOTA HAI: Detail Screen par navigate karna
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PromptDetailScreen(prompt: _prompts[index]),
+                                ),
                               );
                             },
                           );
