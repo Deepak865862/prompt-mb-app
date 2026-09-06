@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Check if user is logged in
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -82,9 +81,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
     setState(() => _isLoading = false);
@@ -102,32 +99,12 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 20),
             const Text('AI Prompt Gallery', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 30),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder(), prefixIcon: Icon(Icons.email)),
-              keyboardType: TextInputType.emailAddress,
-            ),
+            TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder(), prefixIcon: Icon(Icons.email)), keyboardType: TextInputType.emailAddress),
             const SizedBox(height: 15),
-            TextField(
-              controller: _passController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder(), prefixIcon: Icon(Icons.lock)),
-            ),
+            TextField(controller: _passController, obscureText: true, decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder(), prefixIcon: Icon(Icons.lock))),
             const SizedBox(height: 20),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _auth,
-                      style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15)),
-                      child: Text(_isLogin ? 'LOGIN' : 'SIGN UP'),
-                    ),
-                  ),
-            TextButton(
-              onPressed: () => setState(() => _isLogin = !_isLogin),
-              child: Text(_isLogin ? "Don't have account? Sign Up" : "Already have account? Login"),
-            ),
+            _isLoading ? const CircularProgressIndicator() : SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _auth, style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15)), child: Text(_isLogin ? 'LOGIN' : 'SIGN UP'))),
+            TextButton(onPressed: () => setState(() => _isLogin = !_isLogin), child: Text(_isLogin ? "Don't have account? Sign Up" : "Already have account? Login")),
           ],
         ),
       ),
@@ -135,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// --- HOME SCREEN (GALLERY) ---
+// --- HOME SCREEN ---
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -145,33 +122,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ImagePicker _picker = ImagePicker();
-  
-  // Apni website ka URL yahan daalo
-  final String websiteUrl = 'https://prompttmbai.com'; 
+  final String websiteUrl = 'https://prompttmbai.com';
 
-  // --- IMAGE COMPRESSION (1MB ke andar) ---
+  // --- IMAGE COMPRESSION ---
   Future<Uint8List?> compressImageTo1MB(Uint8List imageBytes) async {
     int quality = 90;
-    Uint8List? result = await FlutterImageCompress.compressWithList(
-      imageBytes,
-      quality: quality,
-      minWidth: 1024,
-      minHeight: 1024,
-    );
-
+    Uint8List? result = await FlutterImageCompress.compressWithList(imageBytes, quality: quality, minWidth: 1024, minHeight: 1024);
     while (result != null && result.length > 1048576 && quality > 10) {
       quality -= 10;
-      result = await FlutterImageCompress.compressWithList(
-        imageBytes,
-        quality: quality,
-        minWidth: 1024,
-        minHeight: 1024,
-      );
+      result = await FlutterImageCompress.compressWithList(imageBytes, quality: quality, minWidth: 1024, minHeight: 1024);
     }
     return result;
   }
 
-  // --- UPLOAD TO MILESWEB (upload.php) ---
+  // --- UPLOAD TO WORDPRESS ---
   Future<String?> uploadImageToServer(File imageFile) async {
     try {
       final bytes = await imageFile.readAsBytes();
@@ -181,19 +145,18 @@ class _HomePageState extends State<HomePage> {
       final uploadUrl = '$websiteUrl/upload.php';
       
       var request = http.MultipartRequest('POST', Uri.parse(uploadUrl))
-        ..files.add(http.MultipartFile.fromBytes(
-          'image', // Yeh naam upload.php se match karta hai
-          compressedBytes,
-          filename: 'prompt_${DateTime.now().millisecondsSinceEpoch}.jpg',
-        ));
+        ..files.add(http.MultipartFile.fromBytes('image', compressedBytes, filename: 'prompt_${DateTime.now().millisecondsSinceEpoch}.jpg'));
 
       var response = await request.send();
       var responseData = await http.Response.fromStream(response);
       
+      print('Response: $responseData');
+      
       if (response.statusCode == 200) {
         var jsonData = json.decode(responseData.body);
         if (jsonData['success'] == true) {
-          return '$websiteUrl/uploads/${jsonData['filename']}';
+          // Tumhare PHP code mein 'url' field hai
+          return jsonData['url'];
         }
       }
       return null;
@@ -251,11 +214,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Prompt Gallery'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [IconButton(icon: const Icon(Icons.logout), onPressed: () => FirebaseAuth.instance.signOut())],
-      ),
+      appBar: AppBar(title: const Text('AI Prompt Gallery'), backgroundColor: Theme.of(context).colorScheme.inversePrimary, actions: [IconButton(icon: const Icon(Icons.logout), onPressed: () => FirebaseAuth.instance.signOut())]),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('prompts').orderBy('timestamp', descending: true).snapshots(),
         builder: (context, snapshot) {
@@ -277,20 +236,8 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: CachedNetworkImage(
-                        imageUrl: data['imageUrl'] ?? '',
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        placeholder: (context, url) => Container(color: Colors.grey[300], child: const Center(child: CircularProgressIndicator(strokeWidth: 2))),
-                        errorWidget: (context, url, error) => Container(color: Colors.grey[300], child: const Icon(Icons.error)),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      color: Colors.white,
-                      child: Text(data['promptText'] ?? '', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500), maxLines: 2, overflow: TextOverflow.ellipsis),
-                    ),
+                    Expanded(child: CachedNetworkImage(imageUrl: data['imageUrl'] ?? '', fit: BoxFit.cover, width: double.infinity, placeholder: (context, url) => Container(color: Colors.grey[300], child: const Center(child: CircularProgressIndicator(strokeWidth: 2))), errorWidget: (context, url, error) => Container(color: Colors.grey[300], child: const Icon(Icons.error)))),
+                    Container(padding: const EdgeInsets.all(8), color: Colors.white, child: Text(data['promptText'] ?? '', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500), maxLines: 2, overflow: TextOverflow.ellipsis)),
                   ],
                 ),
               );
@@ -298,11 +245,7 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: uploadPrompt,
-        icon: const Icon(Icons.add_a_photo),
-        label: const Text('Upload'),
-      ),
+      floatingActionButton: FloatingActionButton.extended(onPressed: uploadPrompt, icon: const Icon(Icons.add_a_photo), label: const Text('Upload')),
     );
   }
 }
