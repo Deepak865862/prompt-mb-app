@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import 'home_screen.dart';
+import 'profile_screen.dart'; // Profile screen import kiya
+import 'creator_screen.dart'; // Creator screen import kiya
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -12,12 +14,12 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  // Abhi ke liye sirf Home Screen active hai, baaki screens baad mein banayenge
+  // Ab Home, Explore, Creator, aur Profile screens connect ho gaye hain
   final List<Widget> _screens = [
     const HomeScreen(),
     const Center(child: Text('Explore Screen (Coming Soon)', style: TextStyle(color: Colors.white, fontSize: 18))),
-    const Center(child: Text('Become a Creator (Coming Soon)', style: TextStyle(color: Colors.white, fontSize: 18))),
-    const Center(child: Text('Profile Screen (Coming Soon)', style: TextStyle(color: Colors.white, fontSize: 18))),
+    const CreatorScreen(), // Creator screen directly yahan dikha rahe hain
+    const ProfileScreen(), // Profile screen directly yahan dikha rahe hain
   ];
 
   void _onItemTapped(int index) {
