@@ -32,10 +32,10 @@ dependencies:
   http: ^1.2.0
   dio: ^5.4.0
   
-  # Image Handling
+  # Image Handling (FIXED PACKAGE)
   image_picker: ^1.0.7
   image_cropper: ^5.0.1
-  image_compressor: ^2.0.0
+  flutter_image_compress: ^2.1.0
   photo_view: ^0.14.0
   
   # Utilities
@@ -46,16 +46,12 @@ dependencies:
   shared_preferences: ^2.2.2
   uuid: ^4.3.3
   
-  # Ads
+  # Ads & Payments
   google_mobile_ads: ^4.0.0
-  
-  # In-App Purchases
   in_app_purchase: ^3.1.13
   
-  # Date & Time
+  # Date & Animations
   intl: ^0.19.0
-  
-  # Animations
   animate_do: ^3.3.4
   lottie: ^3.0.0
 
@@ -69,12 +65,3 @@ flutter:
   
   assets:
     - assets/images/
-    - assets/icons/
-    - assets/animations/
-  
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
