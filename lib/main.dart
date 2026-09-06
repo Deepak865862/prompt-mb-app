@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'config/theme.dart';
-import 'screens/main_navigation_screen.dart'; // Navigation screen ko import kiya
+import 'screens/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Status bar ko transparent aur light icons wala banata hai
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -23,9 +24,9 @@ class PromptMBApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Prompt MB',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, // "DEBUG" label hatane ke liye
       theme: AppTheme.darkTheme,
-      home: const MainNavigationScreen(), // Yahan change kiya
+      home: const SplashScreen(), // Sabse pehle Splash Screen dikhayega
     );
   }
 }
