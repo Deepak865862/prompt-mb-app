@@ -5,7 +5,8 @@ import '../widgets/neon_background.dart';
 import '../widgets/prompt_card.dart';
 import '../models/prompt_model.dart';
 import '../services/wordpress_service.dart';
-import 'prompt_detail_screen.dart'; // Detail screen ko import kiya
+import 'prompt_detail_screen.dart';
+import 'search_screen.dart'; // Search screen import kiya
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,9 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadPrompts() async {
     if (!_hasMore || _isLoading) return;
-
     setState(() => _isLoading = true);
-
     try {
       final newPrompts = await _wpService.fetchPrompts(page: _currentPage);
       setState(() {
@@ -43,9 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (newPrompts.isEmpty) _hasMore = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -58,13 +55,18 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: const Text('Prompt MB', style: TextStyle(fontWeight: FontWeight.bold)),
-          actions: const [
-            Icon(Icons.search, color: Colors.white), // Abhi ke liye sirf icon
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Colors.white),
+              onPressed: () {
+                // Search Screen par navigate karna
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+              },
+            ),
           ],
         ),
         body: Column(
           children: [
-            // --- FILTERS SECTION ---
             SizedBox(
               height: 50,
               child: ListView.builder(
@@ -79,60 +81,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: FilterChip(
                       label: Text(category),
                       selected: isSelected,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          _selectedCategory = category;
-                          // Future me yahan category filter logic aayega
-                        });
-                      },
+                      onSelected: (bool selected) { setState(() => _selectedCategory = category); },
                       selectedColor: AppTheme.neonPurple,
                       checkmarkColor: Colors.white,
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.grey, fontWeight: FontWeight.bold),
                     ),
                   );
                 },
               ),
             ),
-            
-            // --- MASONRY GRID SECTION ---
             Expanded(
               child: NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {
-                  if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-                    _loadPrompts(); // Infinite Scrolling
-                  }
+                  if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) _loadPrompts();
                   return true;
                 },
                 child: _prompts.isEmpty && _isLoading
                     ? const Center(child: CircularProgressIndicator(color: AppTheme.neonBlue))
                     : MasonryGridView.count(
-                        crossAxisCount: 2, 
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        padding: const EdgeInsets.all(8),
+                        crossAxisCount: 2, mainAxisSpacing: 8, crossAxisSpacing: 8, padding: const EdgeInsets.all(8),
                         itemCount: _prompts.length + (_hasMore ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index == _prompts.length) {
-                            return const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: CircularProgressIndicator(color: AppTheme.neonPurple),
-                              ),
-                            );
+                            return const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator(color: AppTheme.neonPurple)));
                           }
                           return PromptCard(
                             prompt: _prompts[index],
                             onTap: () {
-                              // YAHAN MAGIC HOTA HAI: Detail Screen par navigate karna
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PromptDetailScreen(prompt: _prompts[index]),
-                                ),
-                              );
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => PromptDetailScreen(prompt: _prompts[index])));
                             },
                           );
                         },
